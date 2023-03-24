@@ -5,6 +5,7 @@ class MyCustomModule(nn.Module):
     def __init__(self):
         super(MyCustomModule, self).__init__()
         self.optimized_module = None
+        self.persistent_compilation = True
         self.linear = nn.Linear(10, 10)
 
     def forward(self, x):
@@ -28,6 +29,8 @@ class MyCustomModule(nn.Module):
     def __setstate__(self, state):
         self.__dict__.update(state)
         self.optimized_module = None
+        if self.persistent_compilation:
+            self.compile()
 
 m = MyCustomModule()
 
@@ -52,3 +55,6 @@ print(f"Compiled inference time: {toc - tic} seconds")
 # And this now no longer crashes
 # Because we are not pickling a frame
 torch.save(m, "model.pt")
+
+# This will actually load a model and then automatically compile it
+torch.load(m)
