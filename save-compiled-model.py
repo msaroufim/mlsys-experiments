@@ -50,4 +50,5 @@ toc = time.time()
 print(f"Compiled inference time: {toc - tic} seconds")
 
 # And this now no longer crashes
+# Because we are not pickling a frame
 torch.save(m, "model.pt")
