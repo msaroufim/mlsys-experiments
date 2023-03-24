@@ -4,7 +4,6 @@ import torch.nn as nn
 class MyCustomModule(nn.Module):
     def __init__(self):
         super(MyCustomModule, self).__init__()
-        # Your module layers and initialization here
         self.optimized_module = None
         self.linear = nn.Linear(10, 10)
 
