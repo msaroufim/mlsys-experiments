@@ -57,4 +57,5 @@ print(f"Compiled inference time: {toc - tic} seconds")
 torch.save(m, "model.pt")
 
 # This will actually load a model and then automatically compile it
+# Thanks Alban for this idea
 torch.load(m)
