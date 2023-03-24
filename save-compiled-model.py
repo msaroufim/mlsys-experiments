@@ -37,6 +37,7 @@ tic = time.time()
 m(torch.randn(1, 10))
 toc = time.time()
 
+# On my mac this takes 0.00046896934509277344 s
 print(f"First inference time: {toc - tic} seconds")
 
 m.compile(backend="inductor")
@@ -45,6 +46,8 @@ tic = time.time()
 m(torch.randn(1, 10))
 toc = time.time()
 
+# On my mac this takes First inference time: 6.145598888397217 seconds
 print(f"Compiled inference time: {toc - tic} seconds")
 
+# And this now no longer crashes
 torch.save(m, "model.pt")
