@@ -11,35 +11,42 @@ class ToyModel(torch.nn.Module):
     def forward(self, x):
         return self.relu(self.l(x))
 
-def instantiate_cache(cache_dir):
+def instantiate_cache_from_state_dict(cache_dir, state_dict):
     cache_files = glob.glob(os.path.join(cache_dir, '**'), recursive=True)
     cache_files = [path for path in cache_files if not os.path.isdir(path)]
+
+    # Instantiate the cache files from the state dict
+    for path in cache_files:
+        rel_path = os.path.relpath(path, cache_dir)
+        if rel_path in state_dict:
+            with open(path, 'wb') as file:
+                file.write(state_dict[rel_path])
+
     return cache_files
 
 # Instantiate the model
 model = ToyModel().cuda()
 
+# Load the checkpoint
+checkpoint = torch.load('model_checkpoint.pth')
+
+# Get the state_dict from the checkpoint
+state_dict = checkpoint['model_state_dict']
+
 # Set the cache directory
 cache_dir = 'cache'
 os.environ['TORCHINDUCTOR_CACHE_DIR'] = cache_dir
 
-# Instantiate the cache files
-cache_files = instantiate_cache(cache_dir)
+# Instantiate the cache files from the state dict
+cache_files = instantiate_cache_from_state_dict(cache_dir, state_dict)
 
-# Load the checkpoint
-checkpoint = torch.load('model_checkpoint.pth')
-
-# Instantiate the cache files to disk
+# Remove the cache files from the state dict
 for path in cache_files:
-    with open(path, 'wb') as file:
-        file.write(checkpoint[os.path.relpath(path, cache_dir)])
-
-# Remove the cache files from the checkpoint
-for path in cache_files:
-    checkpoint.pop(os.path.relpath(path, cache_dir), None)
+    rel_path = os.path.relpath(path, cache_dir)
+    state_dict.pop(rel_path, None)
 
 # Load the model's state_dict
-model.load_state_dict(checkpoint['model_state_dict'])
+model.load_state_dict(state_dict)
 
 # Print the tree structure of the cache folder
 print(f"Cache folder structure:\n{cache_dir}")
