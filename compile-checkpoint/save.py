@@ -19,22 +19,22 @@ class ToyModel(torch.nn.Module):
     def forward(self, x):
         return self.relu(self.l(x))
 
-# Instantiate the model
 model = ToyModel().cuda()
+opt_model = torch.compile(model)
 
-# Save the model state_dict and cache contents
+opt_model(torch.randn(10,10).cuda())
+
+
 checkpoint = {
     'model_state_dict': model.state_dict(),
+    'cache_files': [os.path.relpath(file_path, model.cache_dir) for file_path in model.cache_files]
 }
 
-# Add binary data of cache files and directories to the checkpoint
-for path in model.cache_files:
-    if os.path.isfile(path):
-        with open(path, 'rb') as file:
-            binary_data = file.read()
-            checkpoint[os.path.relpath(path, model.cache_dir)] = binary_data
+# Add binary data for cache files
+for file_path in model.cache_files:
+    if os.path.isfile(file_path):
+        with open(file_path, 'rb') as file:
+            checkpoint[os.path.relpath(file_path, model.cache_dir)] = file.read()
 
 print(checkpoint)
-
-# Save the checkpoint dictionary
 torch.save(checkpoint, 'model_checkpoint.pth')
