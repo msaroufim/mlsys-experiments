@@ -23,10 +23,11 @@ for epoch in range(num_epochs):
         # Backward pass and optimization
         loss.backward()
         optimizer.step()
-
+            
         # Detach outputs from the GPU and move to CPU
         outputs = outputs.detach().cpu()
 
+    # Add a heuristic for when to do this, e.g: inputs with long sequence length
     # Move the model and optimizer to CPU
     model.to("cpu")
     optimizer.to("cpu")
