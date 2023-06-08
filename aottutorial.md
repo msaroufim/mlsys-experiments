@@ -105,10 +105,14 @@ Speficically we need to change
 
 ```python
 if __name__ == "__main__":
-  call(torch.randn(10,64)
+    out = call(torch.randn(64,10))
+    print(out)
 ```
 
 ## Relevant files to study
+
+Since the above works, we just need to package it up in a nice user experience now
+
 * Inductor code cache
 * Inductor codegen wrapper
 * Inductor benchmark utils
